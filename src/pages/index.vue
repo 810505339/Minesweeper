@@ -7,8 +7,8 @@ interface BlockState {
   opened?: boolean
   count: number
 }
-const width = 5
-const height = 5
+const width = 10
+const height = 10
 const direction = [
   [1, -1],
   [1, 0],
@@ -40,18 +40,24 @@ function updateCount() {
     if (block.mines)
       return
 
-    direction.forEach(([dx, dy]) => {
-      const x2 = x + dx
-      const y2 = y + dy
-      if (x2 < 0 || x2 >= width || y2 < 0 || y2 >= height)
-        return
-
-      if (XYList[x2][y2].mines)
-
+    directionFn(block).forEach((b) => {
+      if (b.mines)
         block.count++
     })
   }))
 }
+
+function directionFn(block: BlockState) {
+  return direction.map(([dx, dy]) => {
+    const x2 = block.x + dx
+    const y2 = block.y + dy
+    if (x2 < 0 || x2 >= width || y2 < 0 || y2 >= height)
+      return undefined
+
+    return XYList[x2][y2]
+  }).filter(Boolean) as BlockState[]
+}
+
 function styleFn(block: BlockState) {
   if (!block.opened)
     return ''
@@ -62,8 +68,28 @@ function styleFn(block: BlockState) {
 }
 
 function click(block: BlockState) {
+  if (block.opened)
+    return
+
+  if (block.mines) {
+    alert('this is mines!')
+    return
+  }
+  expendZero(block)
   if (!block.opened)
     block.opened = true
+}
+
+function expendZero(block: BlockState) {
+  if (block.count)
+    return
+
+  directionFn(block).forEach((s) => {
+    if (!s.opened) {
+      s.opened = true
+      expendZero(s)
+    }
+  })
 }
 generateMines()
 updateCount()

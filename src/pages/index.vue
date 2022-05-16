@@ -70,14 +70,14 @@ function styleFn(block: BlockState) {
 function click(block: BlockState) {
   if (block.opened)
     return
-
+  if (!block.opened)
+    block.opened = true
   if (block.mines) {
     alert('this is mines!')
+
     return
   }
   expendZero(block)
-  if (!block.opened)
-    block.opened = true
 }
 
 function expendZero(block: BlockState) {
@@ -101,8 +101,10 @@ updateCount()
     MinesWeeper
   </header>
   <div v-for="(XList, x) in XYList" :key="x" flex="~" justify-center>
-    <button v-for="(block, y) in XList" :key="y" m="0.5" w10 h10 flex justify-center items-center border="~ gray-400/40"
-      hover="bg-gray-400/10" :class="styleFn(block)" @click="click(block)">
+    <button
+      v-for="(block, y) in XList" :key="y" m="0.5" w10 h10 flex justify-center items-center border="~ gray-400/40"
+      hover="bg-gray-400/10" :class="styleFn(block)" @click="click(block)"
+    >
       <div v-if="block.opened" block>
         <div v-if="block.mines" i-mdi-mine />
         <div v-else>
